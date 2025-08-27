@@ -8,7 +8,11 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.models import UpdateUserRequest, UpdateUserResponse, UserCreate, ShowUser, DeleteUserResponse
+from api.models import DeleteUserResponse
+from api.models import ShowUser
+from api.models import UpdateUserRequest
+from api.models import UpdateUserResponse
+from api.models import UserCreate
 from db.dals import UserDAL
 from db.session import get_db
 
