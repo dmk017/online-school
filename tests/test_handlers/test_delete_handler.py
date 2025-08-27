@@ -7,9 +7,9 @@ async def test_delete_user(client, create_user_in_database, get_user_from_databa
         "name": "Test",
         "surname": "Testov",
         "email": "qwe@example.com",
-        "is_active": True
+        "is_active": True,
     }
-    
+
     await create_user_in_database(**user_data)
     resp = await client.delete(f"/user/?user_id={user_data['user_id']}")
     assert resp.status_code == 200
@@ -21,3 +21,29 @@ async def test_delete_user(client, create_user_in_database, get_user_from_databa
     assert user_from_db["email"] == user_data["email"]
     assert user_from_db["is_active"] is False
     assert user_from_db["user_id"] == user_data["user_id"]
+
+
+async def test_delete_user_not_found(client):
+    user_id = uuid4()
+    resp = await client.delete(f"/user/?user_id={user_id}")
+    assert resp.status_code == 404
+    assert resp.json() == {"detail": f"User with id {user_id} not found."}
+
+
+async def test_delete_user_user_id_validation_error(client):
+    resp = await client.delete("/user/?user_id=123")
+    assert resp.status_code == 422
+    data_from_resp = resp.json()
+    assert data_from_resp == {
+        "detail": [
+            {
+                "type": "uuid_parsing",
+                "loc": ["query", "user_id"],
+                "msg": "Input should be a valid UUID, invalid length: expected length 32 for simple format, found 3",
+                "input": "123",
+                "ctx": {
+                    "error": "invalid length: expected length 32 for simple format, found 3"
+                },
+            }
+        ]
+    }
