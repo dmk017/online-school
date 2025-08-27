@@ -2,12 +2,8 @@ import pytest
 
 
 async def test_create_user(client, get_user_from_database):
-    user_data = {
-        "name": "Test",
-        "surname": "Testov",
-        "email": "qwe@example.com"
-    }
-    
+    user_data = {"name": "Test", "surname": "Testov", "email": "qwe@example.com"}
+
     resp = await client.post("/user/", json=user_data)
     data_from_resp = resp.json()
 
@@ -26,11 +22,7 @@ async def test_create_user(client, get_user_from_database):
 
 
 async def test_create_user_duplicate_email_error(client, get_user_from_database):
-    user_data = {
-        "name": "Test",
-        "surname": "Testov",
-        "email": "test@example.com"
-    }
+    user_data = {"name": "Test", "surname": "Testov", "email": "test@example.com"}
     user_data_same_email = {
         "name": "Petr",
         "surname": "Petrov",
