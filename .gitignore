@@ -15,3 +15,7 @@ __pycache__/
 # OS файлы
 .DS_Store
 Thumbs.db
+
+# Миграции
+migrations/
+tests/migrations
