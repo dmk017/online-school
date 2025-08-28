@@ -8,11 +8,11 @@ from jose import jwt
 import settings
 
 
-def create_access_token(data: dict, expire_delta: Optional[timedelta] = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     now = datetime.now(timezone.utc)
-    if expire_delta:
-        expire = now + expire_delta
+    if expires_delta:
+        expire = now + expires_delta
     else:
         expire = now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
