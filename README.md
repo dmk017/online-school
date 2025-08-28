@@ -1,3 +1,18 @@
+# How Started:
+1. Установить зависимости
+```
+[ps]
+python -m venv venv
+pip install -r requirements.txt
+```
+2. Запустить БД через docker
+```
+[ps]
+docker-compose -f docker-compose-local.yaml up -d
+```
+3. Накатить миграции (в корне)
+4. Для проверки тестов также накатить миграции (в tests)
+
 # Миграции:
 Для накатывания миграций, если файла alembic.ini нет, нужно запустить в терминале команду:
 
