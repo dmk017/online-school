@@ -2,7 +2,6 @@ import re
 import uuid
 from typing import Optional
 
-from fastapi import HTTPException
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import constr
@@ -29,6 +28,7 @@ class UserCreate(BaseModel):
     name: str
     surname: str
     email: EmailStr
+    password: str
 
     @field_validator("name")
     @classmethod
@@ -71,3 +71,8 @@ class UpdateUserRequest(BaseModel):
         if not LETTER_MATCH_PATTERN.match(value):
             raise ValueError("Surname should contains only letters")
         return value
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

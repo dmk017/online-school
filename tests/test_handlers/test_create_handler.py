@@ -2,7 +2,12 @@ import pytest
 
 
 async def test_create_user(client, get_user_from_database):
-    user_data = {"name": "Test", "surname": "Testov", "email": "qwe@example.com"}
+    user_data = {
+        "name": "Test",
+        "surname": "Testov",
+        "email": "qwe@example.com",
+        "password": "SamplePass1!",
+    }
 
     resp = await client.post("/user/", json=user_data)
     data_from_resp = resp.json()
@@ -22,11 +27,17 @@ async def test_create_user(client, get_user_from_database):
 
 
 async def test_create_user_duplicate_email_error(client, get_user_from_database):
-    user_data = {"name": "Test", "surname": "Testov", "email": "test@example.com"}
+    user_data = {
+        "name": "Test",
+        "surname": "Testov",
+        "email": "test@example.com",
+        "password": "SamplePass1!",
+    }
     user_data_same_email = {
         "name": "Petr",
         "surname": "Petrov",
         "email": "test@example.com",
+        "password": "SamplePass1!",
     }
     resp = await client.post("/user/", json=user_data)
     data_from_resp = resp.json()
@@ -76,11 +87,17 @@ async def test_create_user_duplicate_email_error(client, get_user_from_database)
                         "msg": "Field required",
                         "input": {},
                     },
+                    {
+                        "type": "missing",
+                        "loc": ["body", "password"],
+                        "msg": "Field required",
+                        "input": {},
+                    },
                 ]
             },
         ),
         (
-            {"name": 123, "surname": 456, "email": "qwe"},
+            {"name": 123, "surname": 456, "email": "qwe", "password": "SamplePass1!"},
             422,
             {
                 "detail": [
@@ -107,7 +124,12 @@ async def test_create_user_duplicate_email_error(client, get_user_from_database)
             },
         ),
         (
-            {"name": "123", "surname": "456", "email": "qwe"},
+            {
+                "name": "123",
+                "surname": "456",
+                "email": "qwe",
+                "password": "SamplePass1!",
+            },
             422,
             {
                 "detail": [
@@ -146,12 +168,23 @@ async def test_create_user_duplicate_email_error(client, get_user_from_database)
                         "msg": "value is not a valid email address: An email address must have an @-sign.",
                         "input": "qwe",
                         "ctx": {"reason": "An email address must have an @-sign."},
-                    }
+                    },
+                    {
+                        "type": "missing",
+                        "loc": ["body", "password"],
+                        "msg": "Field required",
+                        "input": {"name": "Ivan", "surname": "Ivanov", "email": "qwe"},
+                    },
                 ]
             },
         ),
         (
-            {"name": "Ivan", "surname": 456, "email": "qwe"},
+            {
+                "name": "Ivan",
+                "surname": 456,
+                "email": "qwe",
+                "password": "SamplePass1!",
+            },
             422,
             {
                 "detail": [
