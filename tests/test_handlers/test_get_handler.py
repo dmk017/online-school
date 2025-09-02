@@ -11,6 +11,7 @@ async def test_get_user(client, create_user_in_database, get_user_from_database)
         "email": "qwe@example.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
 
     await create_user_in_database(**user_data)
@@ -38,6 +39,7 @@ async def test_get_user_id_validation_error(
         "email": "test@test.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     await create_user_in_database(**user_data)
     resp = await client.get(
@@ -71,6 +73,7 @@ async def test_get_user_not_found(
         "email": "test@test.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     user_id_for_finding = uuid4()
     await create_user_in_database(**user_data)
@@ -90,6 +93,7 @@ async def test_get_user_unauth_error(client, create_user_in_database):
         "email": "lol@kek.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     user_id_for_finding = uuid4()
     await create_user_in_database(**user_data)
@@ -108,6 +112,7 @@ async def test_get_user_bad_cred(client, create_user_in_database):
         "email": "lol@kek.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     await create_user_in_database(**user_data)
     user_id = uuid4()
@@ -127,6 +132,7 @@ async def test_get_user_unauth(client, create_user_in_database):
         "email": "lol@kek.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     await create_user_in_database(**user_data)
     user_id = uuid4()
