@@ -94,3 +94,67 @@ async def update_user_by_id(
         updated_user_params=updated_user_params, session=db, user_id=user_id
     )
     return UpdateUserResponse(updated_user_id=updated_user_id)
+
+
+@user_router.patch("/admin_privileges", response_model=UpdateUserResponse)
+async def grand_admin_privileges(
+    user_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
+):
+    if not current_user.is_superadmin:
+        raise HTTPException(status_code=403, detail="Forbidden.")
+    if current_user.user_id == user_id:
+        raise HTTPException(
+            status_code=406, detail="Cannot manage privileges of itself."
+        )
+
+    user_from_promotion = await _get_user_by_id(user_id, db)
+    if user_from_promotion.is_admin or user_from_promotion.is_superadmin:
+        raise HTTPException(
+            status_code=409,
+            detail=f"User with id {user_id} already promoted to admin / superadmin.",
+        )
+    if user_from_promotion is None:
+        raise HTTPException(
+            status_code=404, detail=f"User with id {user_id} not found."
+        )
+
+    updated_user_params = {
+        "roles": user_from_promotion.enrich_admin_roles_by_admin_role()
+    }
+    updated_user_id = await _update_user(
+        updated_user_params=updated_user_params, session=db, user_id=user_id
+    )
+    return UpdateUserResponse(updated_user_id=updated_user_id)
+
+
+@user_router.delete("/admin_privileges", response_model=UpdateUserResponse)
+async def revoke_admin_privileges(
+    user_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
+):
+    if not current_user.is_superadmin:
+        raise HTTPException(status_code=403, detail="Forbidden.")
+    if current_user.user_id == user_id:
+        raise HTTPException(
+            status_code=406, detail="Cannot manage privileges of itself."
+        )
+
+    user_for_revoke_admin_privileges = await _get_user_by_id(user_id, db)
+    if not user_for_revoke_admin_privileges.is_admin:
+        raise HTTPException(
+            status_code=409, detail=f"User with id {user_id} has no admin privileges."
+        )
+    if user_for_revoke_admin_privileges is None:
+        raise HTTPException(
+            status_code=404, detail=f"User with id {user_id} not found."
+        )
+    updated_user_params = {
+        "roles": user_for_revoke_admin_privileges.remove_admin_privileges_from_model()
+    }
+    updated_user_id = await _update_user(
+        updated_user_params=updated_user_params, session=db, user_id=user_id
+    )
+    return UpdateUserResponse(updated_user_id=updated_user_id)
