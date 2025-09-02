@@ -39,8 +39,8 @@ class User(Base):
 
     def enrich_admin_roles_by_admin_role(self):
         if not self.is_admin:
-            return self.roles + [PortalRole.ROLE_PORTAL_ADMIN]
+            return {*self.roles, PortalRole.ROLE_PORTAL_ADMIN}
 
     def remove_admin_privileges_from_model(self):
         if self.is_admin:
-            return [role for role in self.roles if role != PortalRole.ROLE_PORTAL_ADMIN]
+            return {role for role in self.roles if role != PortalRole.ROLE_PORTAL_ADMIN}
