@@ -1,13 +1,18 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.routing import APIRouter
+from starlette_exporter import handle_metrics
+from starlette_exporter import PrometheusMiddleware
 
 import settings
 from api.handlers import user_router
 from api.login_handler import login_router
 from api.service import service_router
 
+
 app = FastAPI(title="learn-school")
+app.add_middleware(PrometheusMiddleware)
+app.add_route("/metrics", handle_metrics)
 
 main_api_router = APIRouter()
 

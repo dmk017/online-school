@@ -10,6 +10,8 @@ services:
       - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
     networks:
       - custom
   app:
@@ -17,6 +19,10 @@ services:
     image: app
     environment:
       REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
+      APP_PORT: "8000"
+    depends_on:
+      - db
+      - alembic_migrations
     build:
       context: .
       dockerfile: Dockerfile
@@ -24,7 +30,57 @@ services:
       - "8000:8000"
     networks:
       - custom
+  alembic_migrations:
+    container_name: alembic_migrations
+    image: alembic_migrations
+    command: ./run.sh
+    depends_on:
+      - db
+    environment:
+      ALEMBIC_DATABASE_URL: "postgresql://postgres:postgres@db/postgres"
+      REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
+      APP_PORT: "8001"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    networks:
+      - custom
+  prometheus:
+    depends_on:
+      - app
+    image: prom/prometheus:v2.43.0
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file==/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    networks:
+      - custom
+  grafana:
+    image: grafana/grafana:8.5.22
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - grafana-config:/etc/grafana
+    depends_on:
+      - prometheus
+    restart: always
+    networks:
+      - custom
 
 networks:
   custom:
     driver: bridge
+
+volumes:
+  db-data:
+  prometheus-data:
+  grafana-data:
+  grafana-config:
