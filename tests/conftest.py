@@ -16,6 +16,7 @@ import sys
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
+
 # --- Миграции (синхронно, сессия) ---
 @pytest.fixture(scope="session", autouse=True)
 def run_migrations():
